@@ -1,0 +1,157 @@
+Cmp-Mod V01 Created by Cvpcb 0.201503090816+5484~22~ubuntu14.10.1-product   date = 10.03.2015 (вт) 13,50,02 EET
+
+BeginCmp
+TimeStamp = /54F81BC0;
+Reference = C1;
+ValeurCmp = 104;
+IdModule  = kicad_wrk:C_0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F81B57;
+Reference = C2;
+ValeurCmp = 103;
+IdModule  = kicad_wrk:C_0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F81D5B;
+Reference = C3;
+ValeurCmp = 104;
+IdModule  = kicad_wrk:C_0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F82086;
+Reference = C4;
+ValeurCmp = 222;
+IdModule  = kicad_wrk:C_0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F851DC;
+Reference = C5;
+ValeurCmp = 104;
+IdModule  = kicad_wrk:C_0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F96681;
+Reference = P1;
+ValeurCmp = CONN_01X05;
+IdModule  = kicad_wrk:SIP5_Housing;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F97189;
+Reference = P2;
+ValeurCmp = CONN_01X05;
+IdModule  = kicad_wrk:SIP5_Housing;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F82F55;
+Reference = P3;
+ValeurCmp = HE10-10;
+IdModule  = kicad_wrk:UEXTF;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F82519;
+Reference = R1;
+ValeurCmp = 101;
+IdModule  = kicad_wrk:R_0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F82540;
+Reference = R2;
+ValeurCmp = 101;
+IdModule  = kicad_wrk:R_0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F82823;
+Reference = R3;
+ValeurCmp = 101;
+IdModule  = kicad_wrk:R_0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F82888;
+Reference = R4;
+ValeurCmp = 101;
+IdModule  = kicad_wrk:R_0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F82A10;
+Reference = R5;
+ValeurCmp = 101;
+IdModule  = kicad_wrk:R_0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F82B8B;
+Reference = R6;
+ValeurCmp = 101;
+IdModule  = kicad_wrk:R_0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F82DE6;
+Reference = R7;
+ValeurCmp = 101;
+IdModule  = kicad_wrk:R_0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F84465;
+Reference = R8;
+ValeurCmp = 101;
+IdModule  = kicad_wrk:R_0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F847C7;
+Reference = R9;
+ValeurCmp = 102;
+IdModule  = kicad_wrk:R_0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F84816;
+Reference = R10;
+ValeurCmp = 102;
+IdModule  = kicad_wrk:R_0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F84B6C;
+Reference = R11;
+ValeurCmp = 102;
+IdModule  = kicad_wrk:R_0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F86043;
+Reference = R12;
+ValeurCmp = 222;
+IdModule  = kicad_wrk:R_0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F856DF;
+Reference = R13;
+ValeurCmp = 222;
+IdModule  = kicad_wrk:R_0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /54F81ACE;
+Reference = U1;
+ValeurCmp = MPU9150;
+IdModule  = kicad_wrk:QFN-24-1EP_4x4mm_Pitch0.5mm;
+EndCmp
+
+EndListe
