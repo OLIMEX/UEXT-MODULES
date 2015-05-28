@@ -1,0 +1,6 @@
+1.0 (Beta) - 2013.09.19
+Base version.
+
+1.1 - 2013.09.27
+SPI communication between STM32-P103 and MOD-LCD3310 is restored.
+Added demo for the button which will invert the colours of the rows on pressing.
