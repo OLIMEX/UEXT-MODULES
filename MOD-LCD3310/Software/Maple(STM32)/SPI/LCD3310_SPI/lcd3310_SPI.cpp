@@ -313,6 +313,135 @@ void LCDChrXY(unsigned char x, unsigned char y, unsigned char ch)
 
 }
 
+void LCDPixelXY(unsigned char x, unsigned char y)
+{
+    unsigned int index = 0;
+    unsigned int i = 0;
+    
+    // check for out off range
+    if ((x > LCD_X_RES)||(x < 0)) return;
+    if ((y > LCD_Y_RES)||(y < 0)) return;
+
+    index = (unsigned int) x + ((unsigned int) (y/8))*84 ;
+
+    LcdMemory[index] |= 1<<(y%8);
+}
+
+void LCDLine (int x1, int y1, int x2, int y2) {      //draw a line
+   int dx, dy, sx, sy, err, e2;
+   dx = abs (x2-x1);
+   dy = abs (y2-y1);
+   if (x1<x2) sx = 1;
+      else sx = -1;
+   if (y1<y2) sy = 1;
+      else sy = -1;
+   err = dx-dy;
+   do {
+      LCDPixelXY (x1, y1);
+      if ((x1 == x2) && (y1 == y2))
+         break;
+      e2 = 2*err;
+      if (e2 > -dy) {
+         err = err - dy;
+    x1 = x1+sx;
+      }
+      if (e2 < dx) {
+         err = err + dx;
+     y1 = y1 + sy;
+      }
+   } while (1);
+  return;
+}
+
+void LCDRectangle (int x1, int y1, int x2, int y2) {  //draw a rectangle
+   LCDLine (x1, y1, x1, y2);
+   LCDLine (x1, y1, x2, y1);
+   LCDLine (x2, y1, x2, y2);
+   LCDLine (x1, y2, x2, y2);
+   return;
+}
+
+void LCDSolidRectangle (int x1, int y1, int x2, int y2) {  //draw a solid rectangle
+  int i = 0;
+   if (x2>x1)
+      for (i=x1; i<=x2;i++)
+         LCDLine (i, y1, i, y2);
+   else for (i=x2; i<=x1;i++)
+         LCDLine (i, y1, i, y2);
+   return;
+}
+
+void LCD4EllipsePoints (int CX, int CY, int X, int Y) {  //function needed for drawing an ellipse
+   LCDPixelXY (CX+X, CY+Y);
+   LCDPixelXY (CX-X, CY+Y);
+   LCDPixelXY (CX-X, CY-Y);
+   LCDPixelXY (CX+X, CY-Y);
+   return;
+}
+
+void LCDEllipse (int CX, int CY, int XRadius, int YRadius) {   //draw an ellipse & fix radius if negative
+   int X, Y, XChange, YChange, EllipseError, TwoASquare, TwoBSquare, StoppingX, StoppingY;
+   if (XRadius<0) XRadius=-XRadius;
+   if (YRadius<0) YRadius=-YRadius;
+
+   TwoASquare = 2 * XRadius*XRadius;
+   TwoBSquare = 2 * YRadius*YRadius;
+   X = XRadius;
+   Y = 0;
+   XChange = YRadius*YRadius * (1-2*XRadius);
+   YChange = XRadius*XRadius;
+   EllipseError = 0;
+   StoppingX = TwoBSquare*XRadius;
+   StoppingY = 0;
+
+   while (StoppingX >= StoppingY) {          // 1st set of points, y'> -1
+      LCD4EllipsePoints (CX, CY, X, Y);
+      Y++;
+      StoppingY = StoppingY + TwoASquare;
+      EllipseError = EllipseError + YChange;
+      YChange = YChange + TwoASquare;
+      if ((2*EllipseError + XChange) > 0) {
+     X--;
+     StoppingX = StoppingX - TwoBSquare;
+     EllipseError = EllipseError + XChange;
+     XChange = XChange + TwoBSquare;
+   }}
+
+   X = 0;
+   Y = YRadius;
+   XChange = YRadius*YRadius;
+   YChange = XRadius*XRadius * (1-2*YRadius);
+   EllipseError = 0;
+   StoppingX = 0;
+   StoppingY = TwoASquare * YRadius;
+
+   while (StoppingX <= StoppingY) {        // 2nd set of points, y'< -1
+      LCD4EllipsePoints (CX, CY, X, Y);
+      X++;
+      StoppingX = StoppingX + TwoBSquare;
+      EllipseError = EllipseError + XChange;
+      XChange = XChange + TwoBSquare;
+      if ((2*EllipseError + YChange) > 0) {
+         Y--;
+     StoppingY = StoppingY - TwoASquare;
+     EllipseError = EllipseError + YChange;
+     YChange = YChange + TwoASquare;
+   }}
+   return;
+}
+
+void LCDCircle (int x, int y, int r) {   //draw a circle
+   LCDEllipse (x, y, r, r);
+   return;
+}
+
+void LCDTriangle (int x1, int y1, int x2, int y2, int x3, int y3) {   //draw a triangle
+   LCDLine (x1, y1, x2, y2);
+   LCDLine (x2, y2, x3, y3);
+   LCDLine (x3, y3, x1, y1);
+   return;
+}
+
 /****************************************************************************/
 /*  Write negative char at x position on y row                              */
 /*  Function : LCDChrXYInverse                                              */

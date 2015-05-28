@@ -76,7 +76,7 @@ int main(void)
   LCDContrast(0x70);
   LCDStr(0, (unsigned char *)"*** OLIMEX ***", Inverse);
   LCDStr(1, (unsigned char *)"  STM32-P103  ", !Inverse);
-LCDStr(2, (unsigned char *)"  demo  for   ", Inverse);
+  LCDStr(2, (unsigned char *)"  demo  for   ", Inverse);
   LCDStr(3, (unsigned char *)"  MOD-LCD3310 ", !Inverse);
 #if defined  USE_SPI
   LCDStr(4, (unsigned char *)"  using SPI   ", Inverse);

@@ -85,6 +85,23 @@ void LCDPixel (unsigned char x, unsigned char y, unsigned char mode );
 void LCDChrXY (unsigned char x, unsigned char y, unsigned char ch );
 
 /****************************************************************************/
+/*  Write char at x position on y row                                       */
+/*  Function : LCDPixelXY                                                   */
+/*      Parameters                                                          */
+/*          Input   :  position, row                                        */
+/*          Output  :  Nothing                                              */
+/****************************************************************************/
+void LCDPixelXY (unsigned char x, unsigned char y);
+
+void LCDLine (int x1, int y1, int x2, int y2);
+void LCDRectangle (int x1, int y1, int x2, int y2);
+void LCDSolidRectangle (int x1, int y1, int x2, int y2);
+void LCD4EllipsePoints (int CX, int CY, int X, int Y);
+void LCDEllipse (int CX, int CY, int XRadius, int YRadius);
+void LCDCircle (int x, int y, int r);
+void LCDTriangle (int x1, int y1, int x2, int y2, int x3, int y3);
+
+/****************************************************************************/
 /*  Write char at x position on y row - inverse                             */
 /*  Function : LCDChrXY                                                     */
 /*      Parameters                                                          */

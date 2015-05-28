@@ -5,7 +5,7 @@
 /*    Module Name    :  LCD module                                                */
 /*    File   Name    :  lcd.h                                                     */
 /*    Revision       :  02.00                                                     */
-/*    Date           :  2011/06/27 code cleanup                                */
+/*    Date           :  2011/06/27 code clean-up                                  */
 /*    Revision       :  01.00                                                     */
 /*    Date           :  2006/01/26 initial version                                */
 /*                                                                                */
@@ -31,7 +31,7 @@
 #define LCD_CACHE_SIZE             ((LCD_X_RES * LCD_Y_RES) / 8)
 
 /****************************************************************************/
-/*  Init LCD Controler                                                      */
+/*  Initialize LCD Controller                                               */
 /*  Function : LCDInit                                                      */
 /*      Parameters                                                          */
 /*          Input   :  Nothing                                              */
@@ -79,7 +79,7 @@ void LCDPixel (unsigned char x, unsigned char y, unsigned char mode );
 /*  Write char at x position on y row                                       */
 /*  Function : LCDChrXY                                                     */
 /*      Parameters                                                          */
-/*          Input   :  pos, row, char                                       */
+/*          Input   :  position, row, char                                  */
 /*          Output  :  Nothing                                              */
 /****************************************************************************/
 void LCDChrXY (unsigned char x, unsigned char y, unsigned char ch );
@@ -88,7 +88,7 @@ void LCDChrXY (unsigned char x, unsigned char y, unsigned char ch );
 /*  Write char at x position on y row - inverse                             */
 /*  Function : LCDChrXY                                                     */
 /*      Parameters                                                          */
-/*          Input   :  pos, row, char                                       */
+/*          Input   :  position, row, char                                  */
 /*          Output  :  Nothing                                              */
 /****************************************************************************/
 void LCDChrXYInverse (unsigned char x, unsigned char y, unsigned char ch );
