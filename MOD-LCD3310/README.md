@@ -1,7 +1,7 @@
 MOD-LCD3310
 ===========
 
-[![MOD-LCD3310](https://github.com/OLIMEX/UEXT-MODULES/MOD-LCD3310/MOD-LCD3310-1.jpg)
+[![MOD-LCD3310](https://raw.githubusercontent.com/OLIMEX/UEXT-MODULES/master/MOD-LCD3310/MOD-LCD3310-1.jpg)
 [*MOD-LCD3310*](https://www.olimex.com/Products/Modules/LCD/MOD-LCD3310/open-source-hardware)
 
 Hardware
