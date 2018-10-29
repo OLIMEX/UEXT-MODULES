@@ -32,7 +32,7 @@ MOD-IO2 has a PIC16F1503 microcontroller and the firmware is available for modif
 
 ## DOCUMENTS
 
-[MOD-IO2 user manual](doc/MOD-IO2.pdf)
+- [MOD-IO2 user manual](doc/MOD-IO2.pdf)
 
 
 ## HARDWARE
