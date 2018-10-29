@@ -2,6 +2,8 @@
 
 **Input output expandable board with UEXT**
 
+![MOD-IO2 and UEXT cable](../doc/images/MOD-IO2-1.jpg "MOD-IO2 and UEXT cable")
+
 MOD-IO2 is a stackable development board which adds RELAYs and GPIOs to any of our development boards with UEXT.
 If you work with any of our development boards with a [UEXT connector](https://www.olimex.com/Products/Modules/UEXT) and you need more GPIOs and/or RELAY outputs, you can add these by connecting MOD-IO2 to your development board.
 This board gives you an easy way to interface up to 2 relays and 7 GPIOs.
