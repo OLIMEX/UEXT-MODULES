@@ -1,0 +1,52 @@
+#######################################
+# Syntax Coloring Map For Wire
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+setRelay		KEYWORD2
+setAddress	KEYWORD2
+pinMode		KEYWORD2
+digitalWrite	KEYWORD2
+digitalRead	KEYWORD2
+analogRead	KEYWORD2
+setPullpin	KEYWORD2
+readID		KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+IO2			KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+
+IN		LITERAL1
+OUT		LITERAL1
+LO		LITERAL1
+HI		LITERAL1
+ON		LITERAL1
+OFF		LITERAL1	
+RELAY1	LITERAL1
+RELAY2	LITERAL1	
+GPIO0	LITERAL1
+GPIO1	LITERAL1
+GPIO2	LITERAL1
+GPIO3	LITERAL1
+GPIO4	LITERAL1
+GPIO5	LITERAL1
+GPIO6	LITERAL1	
+AN0		LITERAL1
+AN1		LITERAL1
+AN2		LITERAL1
+AN3		LITERAL1
+AN5		LITERAL1

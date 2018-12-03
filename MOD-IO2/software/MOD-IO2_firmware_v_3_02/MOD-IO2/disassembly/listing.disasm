@@ -1,0 +1,1476 @@
+Disassembly Listing for MOD-IO2
+Generated From:
+
+---  E:/Local Repository/MOD-IO2/Software/trunk/WEB_files/Demo_Example_WEB_files/PIC18F26J50 + MOD-TC-MK2/Demo Soft/MOD-IO2/user.c
+1:             /******************************************************************************/
+2:             /* Files to Include                                                           */
+3:             /******************************************************************************/
+4:             
+5:             #include <htc.h>            /* HiTech General Includes */
+6:             #include <stdint.h>         /* For uint8_t definition */
+7:             #include <stdbool.h>        /* For true/false definition */
+8:             
+9:             #include "user.h"
+10:            #include "i2c.h"
+11:            #include "OLIMEX.h"
+12:            
+13:            /******************************************************************************/
+14:            /* User Functions                                                             */
+15:            /******************************************************************************/
+16:            
+17:            /* <Initialize variables in user.h and insert code for user algorithms.> */
+18:            
+19:            void InitApp(void)
+20:            {
+21:                /* TODO Initialize User Ports/Peripherals/Project here */
+22:            
+23:                /* Setup analog functionality and port direction */
+24:            	ANSELC = 0x00;
+0256  0023     MOVLB 0x3
+0257  018E     CLRF PORTC
+25:            	ANSELA = 0x00;
+0258  018C     CLRF PORTA
+26:            
+27:            	SCL_TRIS = 1;
+0259  0021     MOVLB 0x1
+025A  140E     BSF PORTC, 0x0
+28:            	SDA_TRIS = 1;
+025B  148E     BSF PORTC, 0x1
+29:            	SCL_LAT = 0;
+025C  0022     MOVLB 0x2
+025D  100E     BCF PORTC, 0x0
+30:            	SDA_LAT = 0;
+025E  108E     BCF PORTC, 0x1
+31:            
+32:            	REL1_TRIS = 0;
+025F  0021     MOVLB 0x1
+0260  120E     BCF PORTC, 0x4
+33:            	REL2_TRIS = 0;
+0261  110E     BCF PORTC, 0x2
+34:            	REL1 = 0;
+0262  0022     MOVLB 0x2
+0263  120E     BCF PORTC, 0x4
+35:            	REL2 = 0;
+0264  110E     BCF PORTC, 0x2
+36:            
+37:            	OPTION_REGbits.nWPUEN = 0;
+0265  0021     MOVLB 0x1
+0266  1395     BCF TMR0, 0x7
+38:            	WPUAbits.WPUA = 0;
+0267  30C0     MOVLW 0xC0
+0268  0024     MOVLB 0x4
+0269  058C     ANDWF PORTA, F
+39:            	WPUAbits.WPUA5 = 1;
+026A  168C     BSF PORTA, 0x5
+40:            	JMP_TRIS = 1;
+026B  0021     MOVLB 0x1
+026C  168C     BSF PORTA, 0x5
+41:            	JMP_LAT = 0;
+026D  0022     MOVLB 0x2
+026E  128C     BCF PORTA, 0x5
+42:            
+43:            
+44:            
+45:            
+46:                /* Initialize peripherals */
+47:            
+48:                /* Enable interrupts */
+49:            }
+026F  0008     RETURN
+50:            void InitAddress(void)
+51:            {
+52:            	char address;
+53:            	/* READ THE JUMPER*/
+54:            	JMP_TRIS = 1;
+0220  0021     MOVLB 0x1
+0221  168C     BSF PORTA, 0x5
+55:            	WPUAbits.WPUA5 = 1;
+0222  0024     MOVLB 0x4
+0223  168C     BSF PORTA, 0x5
+56:            	if(!JMP_PORT)
+0224  0020     MOVLB 0x0
+0225  1A8C     BTFSC PORTA, 0x5
+0226  2A2A     GOTO 0x22A
+57:            	{
+58:            		/* SET ADDRESS FOR PROGRAMMING*/
+59:            		ADDRESS = 0xF0;
+0227  30F0     MOVLW 0xF0
+0228  00A4     MOVWF ADDRESS
+60:            	}
+0229  0008     RETURN
+61:            	else
+62:            	{
+63:            		WPUAbits.WPUA5 = 1;
+022A  0024     MOVLB 0x4
+022B  168C     BSF PORTA, 0x5
+64:            		address = ReadFlash(ADDR_MEM);
+022C  3007     MOVLW 0x7
+022D  01F0     CLRF data
+022E  00F1     MOVWF i
+022F  22A9     CALL 0x2A9
+0230  00F3     MOVWF i
+65:            		/* IF THE MEMORY CELL IS EMPTY*/
+66:            		if (address == 0xFF)
+0231  3AFF     XORLW 0xFF
+0232  1D03     BTFSS STATUS, 0x2
+0233  2A38     GOTO 0x238
+67:            			ADDRESS = ADDR_DFL;
+0234  30A0     MOVLW 0xA0
+0235  0020     MOVLB 0x0
+0236  00A4     MOVWF ADDRESS
+0237  0008     RETURN
+68:            		else
+69:            			ADDRESS = address;
+0238  0873     MOVF i, W
+0239  0020     MOVLB 0x0
+023A  00A4     MOVWF ADDRESS
+70:            	}
+71:            }
+023B  0008     RETURN
+72:            char ReadFlash(int address)
+73:            {
+74:            	char data = 0;
+75:            	PMADRL = address & 0x00FF;
+02A9  0870     MOVF data, W
+02AA  0023     MOVLB 0x3
+02AB  0091     MOVWF PIR1
+76:            	address >>= 8;
+02AC  0871     MOVF i, W
+02AD  00F0     MOVWF data
+02AE  01F1     CLRF i
+02AF  1BF0     BTFSC data, 0x7
+02B0  03F1     DECF i, F
+77:            	PMADRH = address & 0x00FF;
+02B1  0092     MOVWF PIR2
+78:            	PMCON1bits.CFGS = 0;
+02B2  1315     BCF TMR0, 0x6
+79:            	PMCON1bits.RD = 1;
+02B3  1415     BSF TMR0, 0x0
+80:            	Nop();
+02B4  0000     NOP
+81:            	Nop();
+02B5  0000     NOP
+82:            
+83:            	data = PMDATL;
+02B6  0023     MOVLB 0x3
+02B7  0813     MOVF PIR3, W
+02B8  00F2     MOVWF i
+84:            	return data;
+85:            }
+02B9  0008     RETURN
+86:            void EraseFlash(int address)
+87:            {
+88:            	GIE = 0;
+0297  138B     BCF INTCON, 0x7
+89:            	PMADRL = address & 0x00FF;
+0298  0870     MOVF data, W
+0299  0023     MOVLB 0x3
+029A  0091     MOVWF PIR1
+90:            	address >>= 8;
+029B  0871     MOVF i, W
+029C  00F0     MOVWF data
+029D  01F1     CLRF i
+029E  1BF0     BTFSC data, 0x7
+029F  03F1     DECF i, F
+91:            	PMADRH = address & 0x00FF;
+02A0  0092     MOVWF PIR2
+92:            	PMCON1bits.CFGS = 0;
+02A1  1315     BCF TMR0, 0x6
+93:            	PMCON1bits.FREE = 1;
+02A2  1615     BSF TMR0, 0x4
+94:            	PMCON1bits.WREN = 1;
+02A3  1515     BSF TMR0, 0x2
+95:            	UnlockFlash();
+02A4  22DA     CALL 0x2DA
+96:            	PMCON1bits.WREN = 0;
+02A5  0023     MOVLB 0x3
+02A6  1115     BCF TMR0, 0x2
+97:            	GIE = 1;
+02A7  178B     BSF INTCON, 0x7
+98:            }
+02A8  0008     RETURN
+99:            void UnlockFlash(void)
+100:           {
+101:           	PMCON2 = 0x55;
+02DA  3055     MOVLW 0x55
+02DB  0096     MOVWF TMR1L
+102:           	PMCON2 = 0xAA;
+02DC  30AA     MOVLW 0xAA
+02DD  0096     MOVWF TMR1L
+103:           	PMCON1bits.WR = 1;
+02DE  1495     BSF TMR0, 0x1
+104:           	Nop();
+02DF  0000     NOP
+105:           	Nop();
+02E0  0000     NOP
+106:           }
+02E1  0008     RETURN
+107:           void WriteFlash(int data, int address)
+108:           {
+109:           	GIE = 0;
+0204  138B     BCF INTCON, 0x7
+110:           	PMCON1bits.CFGS = 0;
+0205  0023     MOVLB 0x3
+0206  1315     BCF TMR0, 0x6
+111:           	PMADRL = address & 0x00FF;
+0207  0872     MOVF i, W
+0208  0091     MOVWF PIR1
+112:           	address >>= 8;
+0209  0873     MOVF i, W
+020A  00F2     MOVWF i
+020B  01F3     CLRF i
+020C  1BF2     BTFSC i, 0x7
+020D  03F3     DECF i, F
+113:           	PMADRH = address & 0x00FF;
+020E  0092     MOVWF PIR2
+114:           	PMCON1bits.FREE = 0;
+020F  1215     BCF TMR0, 0x4
+115:           	PMCON1bits.LWLO = 1;
+0210  1695     BSF TMR0, 0x5
+116:           	PMCON1bits.WREN = 1;
+0211  1515     BSF TMR0, 0x2
+117:           	PMDATL = data & 0x00FF;
+0212  0870     MOVF data, W
+0213  0093     MOVWF PIR3
+118:           	data >>= 8;
+0214  0871     MOVF i, W
+0215  00F0     MOVWF data
+0216  01F1     CLRF i
+0217  1BF0     BTFSC data, 0x7
+0218  03F1     DECF i, F
+119:           	PMDATH = data & 0x00FF;
+0219  0094     MOVWF 0x14
+120:           	PMCON1bits.LWLO = 0;
+021A  1295     BCF TMR0, 0x5
+121:           	UnlockFlash();
+021B  22DA     CALL 0x2DA
+122:           	PMCON1bits.WREN = 0;
+021C  0023     MOVLB 0x3
+021D  1115     BCF TMR0, 0x2
+123:           	GIE = 1;
+021E  178B     BSF INTCON, 0x7
+124:           }
+021F  0008     RETURN
+125:           void CommandSetTris()
+126:           {
+127:           	char data;
+128:           	data = ReadByteI2C();
+011A  2270     CALL 0x270
+011B  00F3     MOVWF i
+129:           	SendAck();
+011C  22C8     CALL 0x2C8
+130:           
+131:           
+132:           	GPIO0_TRIS = data & 0x01;
+011D  3001     MOVLW 0x1
+011E  0573     ANDWF i, W
+011F  00F2     MOVWF i
+0120  080C     MOVF PORTA, W
+0121  0672     XORWF i, W
+0122  39FE     ANDLW 0xFE
+0123  0672     XORWF i, W
+0124  008C     MOVWF PORTA
+133:           	data >>= 1;
+0125  36F3     LSRF i, F
+134:           	GPIO1_TRIS = data & 0x01;
+0126  0873     MOVF i, W
+0127  3901     ANDLW 0x1
+0128  00F2     MOVWF i
+0129  0DF2     RLF i, F
+012A  080C     MOVF PORTA, W
+012B  0672     XORWF i, W
+012C  39FD     ANDLW 0xFD
+012D  0672     XORWF i, W
+012E  008C     MOVWF PORTA
+135:           	data >>= 1;
+012F  36F3     LSRF i, F
+136:           	GPIO2_TRIS = data & 0x01;
+0130  0873     MOVF i, W
+0131  3901     ANDLW 0x1
+0132  00F2     MOVWF i
+0133  0DF2     RLF i, F
+0134  0DF2     RLF i, F
+0135  080C     MOVF PORTA, W
+0136  0672     XORWF i, W
+0137  39FB     ANDLW 0xFB
+0138  0672     XORWF i, W
+0139  008C     MOVWF PORTA
+137:           	data >>= 1;
+013A  36F3     LSRF i, F
+138:           	GPIO3_TRIS = 1;
+013B  160C     BSF PORTA, 0x4
+139:           	data >>= 1;
+013C  36F3     LSRF i, F
+140:           	GPIO4_TRIS = data & 0x01;
+013D  0873     MOVF i, W
+013E  3901     ANDLW 0x1
+013F  00F2     MOVWF i
+0140  0EF2     SWAPF i, F
+0141  0DF2     RLF i, F
+0142  080C     MOVF PORTA, W
+0143  0672     XORWF i, W
+0144  39DF     ANDLW 0xDF
+0145  0672     XORWF i, W
+0146  008C     MOVWF PORTA
+141:           	data >>= 1;
+0147  36F3     LSRF i, F
+142:           	GPIO5_TRIS = data & 0x01;
+0148  0873     MOVF i, W
+0149  3901     ANDLW 0x1
+014A  00F2     MOVWF i
+014B  0DF2     RLF i, F
+014C  0DF2     RLF i, F
+014D  0DF2     RLF i, F
+014E  080E     MOVF PORTC, W
+014F  0672     XORWF i, W
+0150  39F7     ANDLW 0xF7
+0151  0672     XORWF i, W
+0152  008E     MOVWF PORTC
+143:           	data >>= 1;
+0153  36F3     LSRF i, F
+144:           	GPIO6_TRIS = data & 0x01;
+0154  0873     MOVF i, W
+0155  3901     ANDLW 0x1
+0156  00F2     MOVWF i
+0157  0EF2     SWAPF i, F
+0158  0DF2     RLF i, F
+0159  080E     MOVF PORTC, W
+015A  0672     XORWF i, W
+015B  39DF     ANDLW 0xDF
+015C  0672     XORWF i, W
+015D  008E     MOVWF PORTC
+145:           
+146:           }
+015E  0008     RETURN
+147:           void CommandSetLat()
+148:           {
+149:           
+150:           	char data;
+151:           	data = ReadByteI2C();
+00D5  2270     CALL 0x270
+152:           	SendAck();
+00D7  22C8     CALL 0x2C8
+153:           
+154:           
+155:           	GPIO0_LAT = data & 0x01;
+00D8  3001     MOVLW 0x1
+00D9  0573     ANDWF i, W
+00DA  00F2     MOVWF i
+00DB  0022     MOVLB 0x2
+00DC  080C     MOVF PORTA, W
+00DD  0672     XORWF i, W
+00DE  39FE     ANDLW 0xFE
+00DF  0672     XORWF i, W
+00E0  008C     MOVWF PORTA
+156:           	data >>= 1;
+00E1  36F3     LSRF i, F
+157:           	GPIO1_LAT = data & 0x01;
+00E2  0873     MOVF i, W
+00E3  3901     ANDLW 0x1
+00E4  00F2     MOVWF i
+00E5  0DF2     RLF i, F
+00E6  080C     MOVF PORTA, W
+00E7  0672     XORWF i, W
+00E8  39FD     ANDLW 0xFD
+00E9  0672     XORWF i, W
+00EA  008C     MOVWF PORTA
+158:           	data >>= 1;
+00EB  36F3     LSRF i, F
+159:           	GPIO2_LAT = data & 0x01;
+00EC  0873     MOVF i, W
+00ED  3901     ANDLW 0x1
+00EE  00F2     MOVWF i
+00EF  0DF2     RLF i, F
+00F0  0DF2     RLF i, F
+00F1  080C     MOVF PORTA, W
+00F2  0672     XORWF i, W
+00F3  39FB     ANDLW 0xFB
+00F4  0672     XORWF i, W
+00F5  008C     MOVWF PORTA
+160:           	data >>= 1;
+00F6  36F3     LSRF i, F
+161:           //	GPIO3_LAT = command & 0x01;	GPIO3 is ALWAYS INPUT!!!
+162:           	data >>= 1;
+00F7  36F3     LSRF i, F
+163:           	GPIO4_LAT = data & 0x01;
+00F8  0873     MOVF i, W
+00F9  3901     ANDLW 0x1
+00FA  00F2     MOVWF i
+00FB  0EF2     SWAPF i, F
+00FC  0DF2     RLF i, F
+00FD  080C     MOVF PORTA, W
+00FE  0672     XORWF i, W
+00FF  39DF     ANDLW 0xDF
+0100  0672     XORWF i, W
+0101  008C     MOVWF PORTA
+164:           	data >>= 1;
+0102  36F3     LSRF i, F
+165:           	GPIO5_LAT = data & 0x01;
+0103  0873     MOVF i, W
+0104  3901     ANDLW 0x1
+0105  00F2     MOVWF i
+0106  0DF2     RLF i, F
+0107  0DF2     RLF i, F
+0108  0DF2     RLF i, F
+0109  080E     MOVF PORTC, W
+010A  0672     XORWF i, W
+010B  39F7     ANDLW 0xF7
+010C  0672     XORWF i, W
+010D  008E     MOVWF PORTC
+166:           	data >>= 1;
+010E  36F3     LSRF i, F
+167:           	GPIO6_LAT = data & 0x01;
+010F  0873     MOVF i, W
+0110  3901     ANDLW 0x1
+0111  00F2     MOVWF i
+0112  0EF2     SWAPF i, F
+0113  0DF2     RLF i, F
+0114  080E     MOVF PORTC, W
+0115  0672     XORWF i, W
+0116  39DF     ANDLW 0xDF
+0117  0672     XORWF i, W
+0118  008E     MOVWF PORTC
+168:           
+169:           }
+0119  0008     RETURN
+170:           void CommandGetPort()
+171:           {
+172:           	char company;
+173:           	char data;
+174:           	StopI2C();
+0199  22F0     CALL 0x2F0
+175:           	StartI2C();
+019A  22BA     CALL 0x2BA
+176:           	company = ReadByteI2C();
+019B  2270     CALL 0x270
+019C  00F4     MOVWF company
+177:           	company >>= 1;
+019D  36F4     LSRF company, F
+178:           	if (company == OLIMEX)
+019E  0874     MOVF company, W
+019F  3A48     XORLW 0x48
+01A0  1D03     BTFSS STATUS, 0x2
+01A1  29C7     GOTO 0x1C7
+179:           	{
+180:           		SendAck();
+01A2  22C8     CALL 0x2C8
+181:           
+182:           		data = GPIO6_PORT & 0x01;
+01A3  3000     MOVLW 0x0
+01A4  0020     MOVLB 0x0
+01A5  1A8E     BTFSC PORTC, 0x5
+01A6  3001     MOVLW 0x1
+01A7  00F5     MOVWF data
+183:           		data <<= 1;
+01A8  35F5     LSLF data, F
+184:           		data |= GPIO5_PORT & 0x01;
+01A9  0C0E     RRF PORTC, W
+01AA  00F3     MOVWF i
+01AB  0CF3     RRF i, F
+01AC  0C73     RRF i, W
+01AD  3901     ANDLW 0x1
+01AE  04F5     IORWF data, F
+185:           		data <<= 1;
+01AF  35F5     LSLF data, F
+186:           		data |= GPIO4_PORT & 0x01;
+01B0  0E0C     SWAPF PORTA, W
+01B1  0C89     RRF WREG, F
+01B2  3901     ANDLW 0x1
+01B3  04F5     IORWF data, F
+187:           		data <<= 1;
+01B4  35F5     LSLF data, F
+188:           		data |= GPIO3_PORT & 0x01;
+01B5  0E0C     SWAPF PORTA, W
+01B6  3901     ANDLW 0x1
+01B7  04F5     IORWF data, F
+189:           		data <<= 1;
+01B8  35F5     LSLF data, F
+190:           		data |= GPIO2_PORT & 0x01;
+01B9  0C0C     RRF PORTA, W
+01BA  0C89     RRF WREG, F
+01BB  3901     ANDLW 0x1
+01BC  04F5     IORWF data, F
+191:           		data <<= 1;
+01BD  35F5     LSLF data, F
+192:           		data |= GPIO1_PORT & 0x01;
+01BE  0C0C     RRF PORTA, W
+01BF  3901     ANDLW 0x1
+01C0  04F5     IORWF data, F
+193:           		data <<= 1;
+01C1  35F5     LSLF data, F
+194:           		data |= GPIO0_PORT & 0x01;
+01C2  080C     MOVF PORTA, W
+01C3  3901     ANDLW 0x1
+01C4  04F5     IORWF data, F
+195:           
+196:           		WriteByteI2C(data);
+01C5  0875     MOVF data, W
+01C6  29E7     GOTO 0x1E7
+197:           
+198:           	}
+199:           	else
+200:           		SendNack();
+01C7  2AEA     GOTO 0x2EA
+201:           
+202:           	
+203:           
+204:           	
+205:           
+206:           
+207:           }
+01C8  01F3     CLRF i
+208:           void CommandSetRelay()
+209:           {
+210:           	
+211:           	char data;
+212:           	data = ReadByteI2C();
+023C  2270     CALL 0x270
+023D  00F3     MOVWF i
+213:           	SendAck();
+023E  22C8     CALL 0x2C8
+214:           
+215:           
+216:           
+217:           	REL1 = data & 0x01;
+023F  0873     MOVF i, W
+0240  3901     ANDLW 0x1
+0241  00F2     MOVWF i
+0242  0EF2     SWAPF i, F
+0243  0022     MOVLB 0x2
+0244  080E     MOVF PORTC, W
+0245  0672     XORWF i, W
+0246  39EF     ANDLW 0xEF
+0247  0672     XORWF i, W
+0248  008E     MOVWF PORTC
+218:           	data >>= 1;
+0249  36F3     LSRF i, F
+219:           	REL2 = data & 0x01;
+024A  0873     MOVF i, W
+024B  3901     ANDLW 0x1
+024C  00F2     MOVWF i
+024D  0DF2     RLF i, F
+024E  0DF2     RLF i, F
+024F  080E     MOVF PORTC, W
+0250  0672     XORWF i, W
+0251  39FB     ANDLW 0xFB
+0252  0672     XORWF i, W
+0253  008E     MOVWF PORTC
+220:           	data >>= 1;
+0254  36F3     LSRF i, F
+221:           }
+0255  0008     RETURN
+222:           void CommandSetAddress()
+223:           {
+224:           
+225:           	char address;
+226:           	address = ReadByteI2C();
+0285  2270     CALL 0x270
+0286  00F4     MOVWF company
+227:           	SendAck();
+0287  22C8     CALL 0x2C8
+228:           
+229:           
+230:           
+231:           	/* STORE THE NEW ADDRESS INTO THE FLASH MEMORY */
+232:           	EraseFlash(ADDR_MEM);
+0288  3007     MOVLW 0x7
+0289  01F0     CLRF data
+028A  00F1     MOVWF i
+028B  2297     CALL 0x297
+233:           	WriteFlash(address, ADDR_MEM);
+028C  0874     MOVF company, W
+028D  00F0     MOVWF data
+028E  3007     MOVLW 0x7
+028F  01F1     CLRF i
+0290  01F2     CLRF i
+0291  00F3     MOVWF i
+0292  2204     CALL 0x204
+234:           	ADDRESS = address;
+0293  0874     MOVF company, W
+0294  0020     MOVLB 0x0
+0295  00A4     MOVWF ADDRESS
+235:           }
+0296  0008     RETURN
+236:           void CommandSetPullUps()
+237:           {
+238:           	char data;
+239:           	data = ReadByteI2C();
+015F  2270     CALL 0x270
+0160  00F3     MOVWF i
+240:           	SendAck();
+0161  22C8     CALL 0x2C8
+241:           
+242:           	WPUAbits.WPUA0 = data & 0x01;
+0162  3001     MOVLW 0x1
+0163  0573     ANDWF i, W
+0164  00F2     MOVWF i
+0165  0024     MOVLB 0x4
+0166  080C     MOVF PORTA, W
+0167  0672     XORWF i, W
+0168  39FE     ANDLW 0xFE
+0169  0672     XORWF i, W
+016A  008C     MOVWF PORTA
+243:           	data >>= 1;
+016B  36F3     LSRF i, F
+244:           	WPUAbits.WPUA1 = data & 0x01;
+016C  0873     MOVF i, W
+016D  3901     ANDLW 0x1
+016E  00F2     MOVWF i
+016F  0DF2     RLF i, F
+0170  080C     MOVF PORTA, W
+0171  0672     XORWF i, W
+0172  39FD     ANDLW 0xFD
+0173  0672     XORWF i, W
+0174  008C     MOVWF PORTA
+245:           	data >>= 1;
+0175  36F3     LSRF i, F
+246:           	WPUAbits.WPUA2 = data & 0x01;
+0176  0873     MOVF i, W
+0177  3901     ANDLW 0x1
+0178  00F2     MOVWF i
+0179  0DF2     RLF i, F
+017A  0DF2     RLF i, F
+017B  080C     MOVF PORTA, W
+017C  0672     XORWF i, W
+017D  39FB     ANDLW 0xFB
+017E  0672     XORWF i, W
+017F  008C     MOVWF PORTA
+247:           	data >>= 1;
+0180  36F3     LSRF i, F
+248:           	WPUAbits.WPUA3 = data & 0x01;
+0181  0873     MOVF i, W
+0182  3901     ANDLW 0x1
+0183  00F2     MOVWF i
+0184  0DF2     RLF i, F
+0185  0DF2     RLF i, F
+0186  0DF2     RLF i, F
+0187  080C     MOVF PORTA, W
+0188  0672     XORWF i, W
+0189  39F7     ANDLW 0xF7
+018A  0672     XORWF i, W
+018B  008C     MOVWF PORTA
+249:           	data >>= 1;
+018C  36F3     LSRF i, F
+250:           	WPUAbits.WPUA5 = data & 0x01;
+018D  0873     MOVF i, W
+018E  3901     ANDLW 0x1
+018F  00F2     MOVWF i
+0190  0EF2     SWAPF i, F
+0191  0DF2     RLF i, F
+0192  080C     MOVF PORTA, W
+0193  0672     XORWF i, W
+0194  39DF     ANDLW 0xDF
+0195  0672     XORWF i, W
+0196  008C     MOVWF PORTA
+251:           	data >>= 1;
+0197  36F3     LSRF i, F
+252:           
+253:           }
+0198  0008     RETURN
+254:           
+255:           void CommandGetAn(char channel)
+256:           {
+257:           	long int result;
+258:           
+259:           	/* PORT INIT */
+260:           
+261:           	char company;
+262:           	char data;
+263:           	StopI2C();
+0075  00FD     MOVWF 0x7D
+264:           	
+265:           	switch(channel)
+0077  2891     GOTO 0x91
+0091  087D     MOVF 0x7D, W
+0092  0084     MOVWF FSR0L
+0093  3008     MOVLW 0x8
+0094  0204     SUBWF FSR0L, W
+0095  1803     BTFSC STATUS, 0x0
+0096  289B     GOTO 0x9B
+0097  3182     MOVLP 0x2
+0098  30D2     MOVLW 0xD2
+0099  0704     ADDWF FSR0L, W
+009A  0082     MOVWF PCL
+02D2  2878     GOTO 0x78
+02D3  287D     GOTO 0x7D
+02D4  2882     GOTO 0x82
+02D5  2887     GOTO 0x87
+02D6  289B     GOTO 0x9B
+02D7  289B     GOTO 0x9B
+02D8  289B     GOTO 0x9B
+02D9  288C     GOTO 0x8C
+266:           	{
+267:           	case 0:
+268:           	{
+269:           		TRISAbits.TRISA0 = 1;
+0078  0021     MOVLB 0x1
+0079  140C     BSF PORTA, 0x0
+270:           		ANSELAbits.ANSA0 = 1;
+007A  0023     MOVLB 0x3
+007B  140C     BSF PORTA, 0x0
+271:           	} break;
+007C  289B     GOTO 0x9B
+272:           	case 1:
+273:           	{
+274:           		TRISAbits.TRISA1 = 1;
+007D  0021     MOVLB 0x1
+007E  148C     BSF PORTA, 0x1
+275:           		ANSELAbits.ANSA1 = 1;
+007F  0023     MOVLB 0x3
+0080  148C     BSF PORTA, 0x1
+276:           	} break;
+0081  289B     GOTO 0x9B
+277:           	case 2:
+278:           	{
+279:           		TRISAbits.TRISA2 = 1;
+0082  0021     MOVLB 0x1
+0083  150C     BSF PORTA, 0x2
+280:           		ANSELAbits.ANSA2 = 1;
+0084  0023     MOVLB 0x3
+0085  150C     BSF PORTA, 0x2
+281:           	} break;
+0086  289B     GOTO 0x9B
+282:           	case 3:
+283:           	{
+284:           		TRISAbits.TRISA4 = 1;
+0087  0021     MOVLB 0x1
+0088  160C     BSF PORTA, 0x4
+285:           		ANSELAbits.ANSA4 = 1;
+0089  0023     MOVLB 0x3
+008A  160C     BSF PORTA, 0x4
+286:           	} break;
+008B  289B     GOTO 0x9B
+287:           	case 7:
+288:           	{
+289:           		TRISCbits.TRISC3 = 1;
+008C  0021     MOVLB 0x1
+008D  158E     BSF PORTC, 0x3
+290:           		ANSELCbits.ANSC3 = 1;
+008E  0023     MOVLB 0x3
+008F  158E     BSF PORTC, 0x3
+291:           	} break;
+0090  289B     GOTO 0x9B
+292:           
+293:           
+294:           	default: break;
+295:           	}
+296:           
+297:           
+298:           	/*CONFIG ADC*/
+299:           	ADCON1bits.ADFM = 1;
+009B  0021     MOVLB 0x1
+009C  179E     BSF 0x1E, 0x7
+300:           	ADCON1bits.ADCS = 0;
+009D  308F     MOVLW 0x8F
+009E  059E     ANDWF 0x1E, F
+301:           	ADCON1bits.ADPREF = 0;
+009F  30FC     MOVLW 0xFC
+00A0  059E     ANDWF 0x1E, F
+302:           	ADCON0bits.CHS = channel;
+00A1  087D     MOVF 0x7D, W
+00A2  00F4     MOVWF company
+00A3  0DF4     RLF company, F
+00A4  0DF4     RLF company, F
+00A5  081D     MOVF 0x1D, W
+00A6  0674     XORWF company, W
+00A7  3983     ANDLW 0x83
+00A8  0674     XORWF company, W
+00A9  009D     MOVWF 0x1D
+303:           	ADCON0bits.ADON = 1;
+00AA  141D     BSF 0x1D, 0x0
+304:           
+305:           	ADCON0bits.ADGO = 1;
+00AB  149D     BSF 0x1D, 0x1
+306:           	while(ADCON0bits.ADGO) ;
+00AC  189D     BTFSC 0x1D, 0x1
+00AD  28AC     GOTO 0xAC
+307:           
+308:           	result = ADRESH;
+00AE  081C     MOVF T2CON, W
+00AF  00F8     MOVWF result
+00B0  01F9     CLRF 0x79
+00B1  01FA     CLRF 0x7A
+00B2  01FB     CLRF 0x7B
+309:           	result << = 8;
+00B3  087A     MOVF 0x7A, W
+00B4  00FB     MOVWF 0x7B
+00B5  0879     MOVF 0x79, W
+00B6  00FA     MOVWF 0x7A
+00B7  0878     MOVF result, W
+00B8  00F9     MOVWF 0x79
+00B9  01F8     CLRF result
+310:           	result |= ADRESL;
+00BA  081B     MOVF PR2, W
+00BB  00F4     MOVWF company
+00BC  01F5     CLRF data
+00BD  01F6     CLRF 0x76
+00BE  01F7     CLRF 0x77
+00BF  04F8     IORWF result, F
+00C0  0875     MOVF data, W
+00C1  04F9     IORWF 0x79, F
+00C2  0876     MOVF 0x76, W
+00C3  04FA     IORWF 0x7A, F
+00C4  0877     MOVF 0x77, W
+00C5  04FB     IORWF 0x7B, F
+311:           
+312:           	StartI2C();
+00C6  22BA     CALL 0x2BA
+313:           	company = ReadByteI2C();
+00C7  2270     CALL 0x270
+00C8  00FC     MOVWF company
+314:           	company >>= 1;
+00C9  36FC     LSRF company, F
+315:           	if (company == OLIMEX)
+00CA  087C     MOVF company, W
+00CB  3A48     XORLW 0x48
+00CC  1D03     BTFSS STATUS, 0x2
+00CD  28D4     GOTO 0xD4
+316:           	{
+317:           		SendAck();
+00CE  22C8     CALL 0x2C8
+318:           		WriteWordI2C(result);
+00CF  0879     MOVF 0x79, W
+00D0  00F1     MOVWF i
+00D1  0878     MOVF result, W
+00D2  00F0     MOVWF data
+00D3  29C8     GOTO 0x1C8
+319:           	}
+320:           	else
+321:           		SendNack();
+00D4  2AEA     GOTO 0x2EA
+322:           
+323:           }
+00D5  2270     CALL 0x270
+324:           
+325:           
+326:           
+327:           void StartSystem(void)
+328:           {
+329:               unsigned char company, device, address, command;
+330:           
+331:               /*Loop until START condition is recieved*/
+332:               StartI2C();
+0008  22BA     CALL 0x2BA
+333:           
+334:               /*Read the first bit of the address*/
+335:               company = ReadByteI2C();
+0009  2270     CALL 0x270
+000A  0020     MOVLB 0x0
+000B  00A2     MOVWF company
+336:               company >>= 1;
+000C  36A2     LSRF company, F
+337:               
+338:           
+339:               if (company == OLIMEX)
+000D  0822     MOVF company, W
+000E  3A48     XORLW 0x48
+000F  1D03     BTFSS STATUS, 0x2
+0010  2873     GOTO 0x73
+340:               {
+341:           	    SendAck();
+0011  22C8     CALL 0x2C8
+342:           
+343:           	    /*Read the second bit of the address*/
+344:           	    device = ReadByteI2C();
+0012  2270     CALL 0x270
+0013  0020     MOVLB 0x0
+0014  00A0     MOVWF device
+345:           	    if (device == MOD_IO2)
+0015  3A02     XORLW 0x2
+0016  1D03     BTFSS STATUS, 0x2
+0017  2873     GOTO 0x73
+346:           	    {
+347:           		    SendAck();
+0018  22C8     CALL 0x2C8
+348:            
+349:           		    /*Read the third bit of the address*/
+350:           		    address = ReadByteI2C();
+0019  2270     CALL 0x270
+001A  0020     MOVLB 0x0
+001B  00A1     MOVWF address
+351:           		    if(ADDRESS == address)
+001C  0624     XORWF ADDRESS, W
+001D  1D03     BTFSS STATUS, 0x2
+001E  2873     GOTO 0x73
+352:           		    {
+353:           			 
+354:           			   
+355:           			    SendAck();
+001F  22C8     CALL 0x2C8
+356:           			    command = ReadByteI2C();
+0020  2270     CALL 0x270
+0021  0020     MOVLB 0x0
+0022  00A3     MOVWF command
+357:           			    /*
+358:           			    unsigned char data, i;
+359:           			    data = 0;
+360:           
+361:           			    SendAck();
+362:           			    for(i = 8; i; i--)
+363:           			    {
+364:           				    while(!SCL_PORT);
+365:           				    data |= SDA_PORT & 0x01;
+366:           				    if (i != 1) data <<= 1;
+367:           				    while(SCL_PORT);
+368:           			    }
+369:           			    SendAck();
+370:           
+371:           			    command = data;
+372:           
+373:           			    */
+374:           			    SendAck();
+0023  22C8     CALL 0x2C8
+375:           			    
+376:           			    if(SET_REL == command)
+0024  0020     MOVLB 0x0
+0025  0823     MOVF command, W
+0026  3A40     XORLW 0x40
+0027  1D03     BTFSS STATUS, 0x2
+0028  282B     GOTO 0x2B
+377:           			    {
+378:           
+379:           				    CommandSetRelay();
+0029  223C     CALL 0x23C
+380:           			    }
+002A  2874     GOTO 0x74
+381:           			    else if(SET_ADDRESS == command)
+002B  0823     MOVF command, W
+002C  3AB0     XORLW 0xB0
+002D  1D03     BTFSS STATUS, 0x2
+002E  2831     GOTO 0x31
+382:           			    {
+383:           				    CommandSetAddress();
+002F  2285     CALL 0x285
+384:           				    
+385:           			    }
+0030  2874     GOTO 0x74
+386:           			    else if(SET_TRIS == command)
+0031  0323     DECF command, W
+0032  1D03     BTFSS STATUS, 0x2
+0033  2836     GOTO 0x36
+387:           			    {
+388:           				    CommandSetTris();
+0034  211A     CALL 0x11A
+389:           				    /*
+390:           					char data;
+391:           					data = ReadByteI2C();
+392:           					SendAck();
+393:           
+394:           
+395:           					GPIO0_TRIS = data & 0x01;
+396:           					data >>= 1;
+397:           					GPIO1_TRIS = data & 0x01;
+398:           					data >>= 1;
+399:           					GPIO2_TRIS = data & 0x01;
+400:           					data >>= 1;
+401:           					GPIO3_TRIS = 1;
+402:           					data >>= 1;
+403:           					GPIO4_TRIS = data & 0x01;
+404:           					data >>= 1;
+405:           					GPIO5_TRIS = data & 0x01;
+406:           					data >>= 1;
+407:           					GPIO6_TRIS = data & 0x01;
+408:           */
+409:           				
+410:           			    }
+0035  2874     GOTO 0x74
+411:           			    else if(SET_LAT == command)
+0036  0823     MOVF command, W
+0037  3A02     XORLW 0x2
+0038  1D03     BTFSS STATUS, 0x2
+0039  283C     GOTO 0x3C
+412:           			    {
+413:           				    CommandSetLat();
+003A  20D5     CALL 0xD5
+414:           			    }
+003B  2874     GOTO 0x74
+415:           			    else if(GET_PORT == command)
+003C  0823     MOVF command, W
+003D  3A03     XORLW 0x3
+003E  1D03     BTFSS STATUS, 0x2
+003F  2842     GOTO 0x42
+416:           			    {
+417:           
+418:           				    CommandGetPort();
+0040  2199     CALL 0x199
+419:           			    }
+0041  2874     GOTO 0x74
+420:           			    else if(SET_PU == command)
+0042  0823     MOVF command, W
+0043  3A04     XORLW 0x4
+0044  1D03     BTFSS STATUS, 0x2
+0045  2848     GOTO 0x48
+421:           			    {
+422:           				    CommandSetPullUps();
+0046  215F     CALL 0x15F
+423:           			    }
+0047  2874     GOTO 0x74
+424:           			    else if(GET_AN0 == command)
+0048  0823     MOVF command, W
+0049  3A10     XORLW 0x10
+004A  1D03     BTFSS STATUS, 0x2
+004B  284F     GOTO 0x4F
+425:           			    {
+426:           				    CommandGetAn(0);
+004C  3000     MOVLW 0x0
+004D  2075     CALL 0x75
+427:           			    }
+004E  2874     GOTO 0x74
+428:           			    else if(GET_AN1 == command)
+004F  0823     MOVF command, W
+0050  3A11     XORLW 0x11
+0051  1D03     BTFSS STATUS, 0x2
+0052  2856     GOTO 0x56
+429:           			    {
+430:           				    CommandGetAn(1);
+0053  3001     MOVLW 0x1
+0054  2075     CALL 0x75
+431:           			    }
+0055  2874     GOTO 0x74
+432:           			    else if(GET_AN2 == command)
+0056  0823     MOVF command, W
+0057  3A12     XORLW 0x12
+0058  1D03     BTFSS STATUS, 0x2
+0059  285D     GOTO 0x5D
+433:           			    {
+434:           				    CommandGetAn(2);
+005A  3002     MOVLW 0x2
+005B  2075     CALL 0x75
+435:           			    }
+005C  2874     GOTO 0x74
+436:           			    else if(GET_AN3 == command)
+005D  0823     MOVF command, W
+005E  3A13     XORLW 0x13
+005F  1D03     BTFSS STATUS, 0x2
+0060  2864     GOTO 0x64
+437:           			    {
+438:           				    CommandGetAn(3);
+0061  3003     MOVLW 0x3
+0062  2075     CALL 0x75
+439:           			    }
+0063  2874     GOTO 0x74
+440:           			    else if(GET_AN7 == command)
+0064  0823     MOVF command, W
+0065  3A17     XORLW 0x17
+0066  1D03     BTFSS STATUS, 0x2
+0067  286B     GOTO 0x6B
+441:           			    {
+442:           				    CommandGetAn(7);
+0068  3007     MOVLW 0x7
+0069  2075     CALL 0x75
+443:           			    }
+006A  2874     GOTO 0x74
+444:           			    else
+445:           				    WriteFlash(command, 0x707);
+006B  0823     MOVF command, W
+006C  00F0     MOVWF data
+006D  3007     MOVLW 0x7
+006E  01F1     CLRF i
+006F  00F2     MOVWF i
+0070  00F3     MOVWF i
+0071  2204     CALL 0x204
+0072  2874     GOTO 0x74
+446:           
+447:           			       
+448:           
+449:           		    }
+450:           		    else
+451:           			    SendNack();
+0073  22EA     CALL 0x2EA
+452:           	    }
+453:           	    else
+454:           		    SendNack();
+455:           
+456:               }
+457:               else
+458:           	    SendNack();
+459:               /*Wait for STOP condition*/
+460:               StopI2C();
+0074  2AF0     GOTO 0x2F0
+461:           
+462:           
+463:               }
+0075  00FD     MOVWF 0x7D
+464:           
+---  E:/Local Repository/MOD-IO2/Software/trunk/WEB_files/Demo_Example_WEB_files/PIC18F26J50 + MOD-TC-MK2/Demo Soft/MOD-IO2/system.c
+1:             /******************************************************************************/
+2:             /*Files to Include                                                            */
+3:             /******************************************************************************/
+4:             
+5:             #include <htc.h>           /* HiTech General Includes */
+6:             #include "system.h"
+7:             
+8:             /* Refer to the device datasheet for information about available
+9:             oscillator configurations. */
+10:            void ConfigureOscillator(void)
+11:            {
+12:            	OSCCONbits.IRCF = 0b1111;
+02E2  3078     MOVLW 0x78
+02E3  0021     MOVLB 0x1
+02E4  0499     IORWF T1GCON, F
+13:            	OSCCONbits.SCS  = 0b11;
+02E5  3003     MOVLW 0x3
+02E6  0499     IORWF T1GCON, F
+14:            
+15:            	while(!OSCSTATbits.HFIOFR);
+02E7  1A1A     BTFSC TMR2, 0x4
+02E8  0008     RETURN
+02E9  2AE7     GOTO 0x2E7
+16:            }
+02EA  0020     MOVLB 0x0
+---  E:/Local Repository/MOD-IO2/Software/trunk/WEB_files/Demo_Example_WEB_files/PIC18F26J50 + MOD-TC-MK2/Demo Soft/MOD-IO2/main.c
+1:             /******************************************************************************/
+2:             /* Files to Include                                                           */
+3:             /******************************************************************************/
+4:             
+5:             #include <htc.h>           /* Global Header File */
+6:             
+7:             #include "system.h"        /* System funct/params, like osc/peripheral config */
+8:             #include "user.h"          /* User funct/params, such as InitApp */
+9:             
+10:            
+11:            /******************************************************************************/
+12:            /* User Global Variable Declaration                                           */
+13:            /******************************************************************************/
+14:            
+15:            
+16:            char ADDRESS;
+17:            
+18:            
+19:            
+20:            /******************************************************************************/
+21:            /* Main Program                                                               */
+22:            /******************************************************************************/
+23:            
+24:            
+25:            void main(void)
+26:            {
+27:            
+28:            
+29:                ConfigureOscillator();
+02F6  22E2     CALL 0x2E2
+30:                InitApp();
+02F7  2256     CALL 0x256
+31:                InitAddress();
+02F8  2220     CALL 0x220
+32:            
+33:                while(1)
+34:                {
+35:            	    StartSystem();
+02F9  2008     CALL 0x8
+02FA  2AF9     GOTO 0x2F9
+36:            
+37:            
+38:            
+39:                }
+40:            	  
+41:            }
+02FB  01A4     CLRF ADDRESS
+42:            
+43:            
+44:            
+---  E:/Local Repository/MOD-IO2/Software/trunk/WEB_files/Demo_Example_WEB_files/PIC18F26J50 + MOD-TC-MK2/Demo Soft/MOD-IO2/interrupts.c
+1:             /******************************************************************************/
+2:             /*Files to Include                                                            */
+3:             /******************************************************************************/
+4:             
+5:             #include <htc.h>            /* HiTech General Includes */
+6:             #include "user.h"
+7:             
+8:             /******************************************************************************/
+9:             /* Interrupt Routines                                                         */
+10:            /******************************************************************************/
+11:            
+12:            /* High-priority service */
+13:            void interrupt high_isr(void)
+14:            {
+0004  3180     MOVLP 0x0
+15:            
+16:                  /* This code stub shows general interrupt handling.  Note that these
+17:                  conditional statements are not handled within 3 seperate if blocks.
+18:                  Do not use a seperate if block for each interrupt flag to avoid run
+19:                  time errors. */
+20:            	
+21:            
+22:            #if 0
+23:                
+24:                  /* TODO Add High Priority interrupt routine code here. */
+25:            
+26:                  /* Determine which flag generated the interrupt */
+27:                  if(<Interrupt Flag 1>)
+28:                  {
+29:                      <Interrupt Flag 1=0>; /* Clear Interrupt Flag 1 */
+30:                  }
+31:                  else if (<Interrupt Flag 2>)
+32:                  {
+33:                      <Interrupt Flag 2=0>; /* Clear Interrupt Flag 2 */
+34:                  }
+35:                  else
+36:                  {
+37:                      /* Unhandled interrupts */
+38:                  }
+39:            
+40:            #endif
+41:            
+42:            }
+0005  0009     RETFIE
+43:            
+44:            /* Low-priority interrupt routine */
+45:            #if 0
+46:            void low_priority interrupt low_isr(void)
+47:            {
+48:            
+49:                  /* This code stub shows general interrupt handling.  Note that these
+50:                  conditional statements are not handled within 3 seperate if blocks.
+51:                  Do not use a seperate if block for each interrupt flag to avoid run
+52:                  time errors. */
+53:            
+54:            #if 0
+55:            
+56:                  /* TODO Add Low Priority interrupt routine code here. */
+57:            
+58:                  /* Determine which flag generated the interrupt */
+59:                  if(<Interrupt Flag 1>)
+60:                  {
+61:                      <Interrupt Flag 1=0>; /* Clear Interrupt Flag 1 */
+62:                  }
+63:                  else if (<Interrupt Flag 2>)
+64:                  {
+65:                      <Interrupt Flag 2=0>; /* Clear Interrupt Flag 2 */
+66:                  }
+67:                  else
+68:                  {
+69:                      /* Unhandled interrupts */
+70:                  }
+71:            
+72:            #endif
+73:            
+74:            }
+75:            #endif
+---  E:/Local Repository/MOD-IO2/Software/trunk/WEB_files/Demo_Example_WEB_files/PIC18F26J50 + MOD-TC-MK2/Demo Soft/MOD-IO2/i2c.c
+1:             /******************************************************************************/
+2:             /* Files to Include                                                           */
+3:             /******************************************************************************/
+4:             
+5:             #include <htc.h>            /* HiTech General Includes */
+6:             #include <stdint.h>         /* For uint8_t definition */
+7:             #include <stdbool.h>        /* For true/false definition */
+8:             
+9:             #include "user.h"
+10:            #include "OLIMEX.h"
+11:            #include "i2c.h"
+12:            
+13:            /******************************************************************************/
+14:            /* User Functions                                                             */
+15:            /******************************************************************************/
+16:            
+17:            void StartI2C(void)
+18:            
+19:            {
+20:            	if(!SDA_PORT)
+02BA  0020     MOVLB 0x0
+02BB  1C8E     BTFSS PORTC, 0x1
+21:            		while(!SDA_PORT);
+02BC  1C8E     BTFSS PORTC, 0x1
+02BD  2ABC     GOTO 0x2BC
+22:            	while(1)
+23:            	{
+24:            		while(SDA_PORT);
+02BE  188E     BTFSC PORTC, 0x1
+02BF  2ABE     GOTO 0x2BE
+25:            		if(SCL_PORT)
+02C0  180E     BTFSC PORTC, 0x0
+02C1  2AC5     GOTO 0x2C5
+26:            			break;
+27:            		while(!SDA_PORT);
+02C2  188E     BTFSC PORTC, 0x1
+02C3  2ABE     GOTO 0x2BE
+02C4  2AC2     GOTO 0x2C2
+28:            	}
+29:            	while(SCL_PORT);
+02C5  1C0E     BTFSS PORTC, 0x0
+02C6  0008     RETURN
+02C7  2AC5     GOTO 0x2C5
+30:            }
+02C8  0021     MOVLB 0x1
+31:            
+32:            
+33:            void StopI2C(void)
+34:            {
+35:            	/*
+36:            	char last, current;
+37:            	while(!SCL_PORT);
+38:            	last = SDA_PORT;
+39:            	while(1)
+40:            	{
+41:            		current = SDA_PORT;
+42:            		if(current ^ last)
+43:            		{
+44:            			if(SDA_PORT && SCL_PORT)
+45:            				break;
+46:            		}
+47:            		last = current;
+48:            
+49:            	}
+50:            	*/
+51:            	while(!(SDA_PORT && SCL_PORT));
+02F0  0020     MOVLB 0x0
+52:            }
+02F6  22E2     CALL 0x2E2
+53:            unsigned char ReadByteI2C(void)
+54:            {
+55:            	unsigned char data, i;
+56:            	data = 0;
+0271  01F0     CLRF data
+57:            
+58:            	for(i = 8; i; i--)
+0270  3008     MOVLW 0x8
+0272  00F1     MOVWF i
+0273  08F1     MOVF i, F
+0274  1903     BTFSC STATUS, 0x2
+0275  2A83     GOTO 0x283
+0281  03F1     DECF i, F
+0282  2A73     GOTO 0x273
+59:            	{
+60:            		while(!SCL_PORT);
+0276  0020     MOVLB 0x0
+0277  1C0E     BTFSS PORTC, 0x0
+0278  2A76     GOTO 0x276
+61:            		data |= SDA_PORT & 0x01;
+0279  0C0E     RRF PORTC, W
+027A  3901     ANDLW 0x1
+027B  04F0     IORWF data, F
+62:            		if (i != 1) data <<= 1;
+027C  0371     DECF i, W
+027D  1D03     BTFSS STATUS, 0x2
+027E  35F0     LSLF data, F
+63:            		while(SCL_PORT);
+027F  180E     BTFSC PORTC, 0x0
+0280  2A7F     GOTO 0x27F
+64:            
+65:            	}
+66:            	return data;
+0283  0870     MOVF data, W
+67:             
+68:            }
+0284  0008     RETURN
+69:            void WriteByteI2C(char data)
+70:            {
+01E7  00F1     MOVWF i
+71:            	SDA_TRIS = 0;
+01E8  0021     MOVLB 0x1
+01E9  108E     BCF PORTC, 0x1
+72:            	
+73:            	char i;
+74:            	for(i = 0; i < 8; i++)
+01EA  01F2     CLRF i
+01FC  3008     MOVLW 0x8
+01FD  0AF2     INCF i, F
+01FE  0272     SUBWF i, W
+01FF  1C03     BTFSS STATUS, 0x0
+0200  29EB     GOTO 0x1EB
+75:            	{
+76:            
+77:            		SDA_TRIS = (data & 0x80) ? 1 : 0 ;
+01EB  3000     MOVLW 0x0
+01EC  1BF1     BTFSC i, 0x7
+01ED  3001     MOVLW 0x1
+01EE  00F0     MOVWF data
+01EF  0DF0     RLF data, F
+01F0  0021     MOVLB 0x1
+01F1  080E     MOVF PORTC, W
+01F2  0670     XORWF data, W
+01F3  39FD     ANDLW 0xFD
+01F4  0670     XORWF data, W
+01F5  008E     MOVWF PORTC
+78:            		data <<= 1;
+01F6  35F1     LSLF i, F
+79:            		while(!SCL_PORT);
+01F7  0020     MOVLB 0x0
+01F8  1C0E     BTFSS PORTC, 0x0
+01F9  29F7     GOTO 0x1F7
+80:            		while(SCL_PORT);
+01FA  180E     BTFSC PORTC, 0x0
+01FB  29FA     GOTO 0x1FA
+81:            	}
+82:            	SDA_TRIS = 1;
+0201  0021     MOVLB 0x1
+0202  148E     BSF PORTC, 0x1
+83:            	
+84:            }
+0203  0008     RETURN
+85:            void WriteWordI2C(int data)
+86:            {
+87:            	char i;
+88:            	for(i = 0; i < 16; i++)
+01C8  01F3     CLRF i
+01DF  3010     MOVLW 0x10
+01E0  0AF3     INCF i, F
+01E1  0273     SUBWF i, W
+01E2  1C03     BTFSS STATUS, 0x0
+01E3  29C9     GOTO 0x1C9
+89:            	{
+90:            
+91:            		SDA_TRIS = (data & 0x8000) ? 1 : 0 ;
+01C9  3000     MOVLW 0x0
+01CA  1BF1     BTFSC i, 0x7
+01CB  3001     MOVLW 0x1
+01CC  00F2     MOVWF i
+01CD  0DF2     RLF i, F
+01CE  0021     MOVLB 0x1
+01CF  080E     MOVF PORTC, W
+01D0  0672     XORWF i, W
+01D1  39FD     ANDLW 0xFD
+01D2  0672     XORWF i, W
+01D3  008E     MOVWF PORTC
+92:            		if(i != 15) data <<= 1;
+01D4  0873     MOVF i, W
+01D5  3A0F     XORLW 0xF
+01D6  1903     BTFSC STATUS, 0x2
+01D7  29DA     GOTO 0x1DA
+01D8  35F0     LSLF data, F
+01D9  0DF1     RLF i, F
+93:            		while(!SCL_PORT);
+01DA  0020     MOVLB 0x0
+01DB  1C0E     BTFSS PORTC, 0x0
+01DC  29DA     GOTO 0x1DA
+94:            		while(SCL_PORT);
+01DD  180E     BTFSC PORTC, 0x0
+01DE  29DD     GOTO 0x1DD
+95:            	}
+96:            	SDA_TRIS = 1;
+01E4  0021     MOVLB 0x1
+01E5  148E     BSF PORTC, 0x1
+97:            }
+01E6  0008     RETURN
+98:            void SendAck(void)
+99:            {
+100:           	SDA_TRIS = 0;
+02C8  0021     MOVLB 0x1
+02C9  108E     BCF PORTC, 0x1
+101:           	while(!SCL_PORT);
+02CA  0020     MOVLB 0x0
+02CB  1C0E     BTFSS PORTC, 0x0
+02CC  2ACA     GOTO 0x2CA
+102:           	while(SCL_PORT);
+02CD  180E     BTFSC PORTC, 0x0
+02CE  2ACD     GOTO 0x2CD
+103:           	SDA_TRIS = 1;
+02CF  0021     MOVLB 0x1
+02D0  148E     BSF PORTC, 0x1
+104:           }
+02D1  0008     RETURN
+105:           void SendNack(void)
+106:           {
+107:           	while(!SCL_PORT);
+02EA  0020     MOVLB 0x0
+02EB  1C0E     BTFSS PORTC, 0x0
+02EC  2AEA     GOTO 0x2EA
+108:           	while(SCL_PORT);
+02ED  1C0E     BTFSS PORTC, 0x0
+02EE  0008     RETURN
+02EF  2AED     GOTO 0x2ED
+109:           }
+02F0  0020     MOVLB 0x0
+110:           
+111:           
