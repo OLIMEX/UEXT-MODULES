@@ -56,7 +56,7 @@ void loop() {
         data[i] = Read(0x88 + i);
       }
       ADC_1 = (data[1] << 8) | data[0];
-      ADC_0 = (data[3] << 8) | data[1];
+      ADC_0 = (data[3] << 8) | data[2];
       Serial.print("ALS1: ");
       Serial.print(ADC_1, DEC);
       Serial.println(" LUX");
