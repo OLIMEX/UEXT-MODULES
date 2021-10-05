@@ -9,26 +9,35 @@
 
 /* TO IMPLEMENT YOUR VERSION OF THE DRIVER YOU'LL HAVE TO EDIT THIS SECTION ONLY */
 
+// Values for ESP-PoE-ISO rev A
+// Compared MOD-LCD3310-schematic.pdf with pin designations for ESP-PoE-ISO
+#define LCD_MOSI 2
+#define LCD_SCK  14
+#define LCD_CS   5
+#define LCD_RES  15
+#define LCD_CD   13
 
-	#define LCD_MOSI_MAKE_OUT()     pinMode (16, OUTPUT)
-	#define LCD_MOSI_HIGH()         digitalWrite (16, 1)
-	#define LCD_MOSI_LOW()          digitalWrite (16, 0)
+#define LCD_MOSI_MAKE_OUT()     pinMode (LCD_MOSI, OUTPUT)
+#define LCD_MOSI_HIGH()         digitalWrite (LCD_MOSI, 1)
+#define LCD_MOSI_LOW()          digitalWrite (LCD_MOSI, 0)
 
-	#define LCD_SCK_MAKE_OUT()      pinMode (15, OUTPUT)
-	#define LCD_SCK_HIGH()          digitalWrite (15, 1)
-	#define LCD_SCK_LOW()           digitalWrite (15, 0)
+#define LCD_SCK_MAKE_OUT()      pinMode (LCD_SCK, OUTPUT)
+#define LCD_SCK_HIGH()          digitalWrite (LCD_SCK, 1)
+#define LCD_SCK_LOW()           digitalWrite (LCD_SCK, 0)
 
-	#define LCD_CS_MAKE_OUT()       pinMode (13, OUTPUT)
-	#define LCD_CS_HIGH()           digitalWrite (13, 1)
-	#define LCD_CS_LOW()            digitalWrite (13, 0)
+#define LCD_CS_MAKE_OUT()       pinMode (LCD_CS, OUTPUT)
+#define LCD_CS_HIGH()           digitalWrite (LCD_CS, 1)
+#define LCD_CS_LOW()            digitalWrite (LCD_CS, 0)
 
-	#define LCD_RES_MAKE_OUT()      pinMode (3, OUTPUT)
-	#define LCD_RES_HIGH()          digitalWrite (3, 1)
-	#define LCD_RES_LOW()           digitalWrite (3, 0)
+#define LCD_RES_MAKE_OUT()      pinMode (LCD_RES, OUTPUT)
+#define LCD_RES_HIGH()          digitalWrite (LCD_RES, 1)
+#define LCD_RES_LOW()           digitalWrite (LCD_RES, 0)
 
-	#define LCD_CD_MAKE_OUT()       pinMode (2, OUTPUT)
-	#define LCD_CD_HIGH()           digitalWrite (2, 1)
-	#define LCD_CD_LOW()            digitalWrite (2, 0)
+#define LCD_CD_MAKE_OUT()       pinMode (LCD_CD, OUTPUT)
+#define LCD_CD_HIGH()           digitalWrite (LCD_CD, 1)
+#define LCD_CD_LOW()            digitalWrite (LCD_CD, 0)
+
+
 
 #define SEND_BYTE_SPI()                     \
         {                                   \
